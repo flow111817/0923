@@ -312,7 +312,10 @@ async function loadNotes() {
 
 async function loadNotesLocal() {
     try {
-        const resp = await fetch('data/letters.json');
+        // 添加时间戳参数绕过缓存
+        const resp = await fetch('data/letters.json?_t=' + Date.now(), {
+            cache: 'no-store'
+        });
         if (resp.ok) {
             const text = await resp.text();
             if (text.trim()) {
