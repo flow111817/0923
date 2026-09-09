@@ -1,0 +1,24 @@
+# 产品说明文档（私有，不上传）
+PRODUCT.md
+
+# 系统文件
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node（如果有用到的话）
+node_modules/
+package-lock.json
+npm-debug.log
+
+# 构建产物
+.next/
+dist/
+build/
