@@ -1,0 +1,655 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --cream: #FFF8F3;
+    --pink: #FFB6C1;
+    --pink-light: #FFE4E8;
+    --mint: #98D8C8;
+    --yellow: #FFD93D;
+    --brown: #8B6F47;
+    --text: #5D4E37;
+}
+
+body {
+    font-family: 'Noto Serif SC', serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Password Screen */
+.password-screen {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, var(--pink-light) 0%, var(--cream) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.6s, transform 0.6s;
+}
+
+.password-screen.hidden {
+    opacity: 0;
+    transform: scale(1.1);
+    pointer-events: none;
+}
+
+.password-title {
+    font-family: 'ZCOOL KuaiLe', cursive;
+    font-size: 2.5rem;
+    color: var(--brown);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.password-subtitle {
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 2rem;
+    opacity: 0.7;
+}
+
+.password-input {
+    font-family: 'ZCOOL KuaiLe', cursive;
+    font-size: 1.5rem;
+    text-align: center;
+    width: 240px;
+    padding: 1rem;
+    border: 3px dashed var(--pink);
+    border-radius: 20px;
+    background: white;
+    color: var(--brown);
+    outline: none;
+    transition: border-color 0.3s;
+    letter-spacing: 0.3em;
+}
+
+.password-input:focus {
+    border-color: var(--mint);
+}
+
+.password-hint {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text);
+    opacity: 0.5;
+}
+
+.password-error {
+    margin-top: 1rem;
+    color: #e74c3c;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.password-error.show {
+    opacity: 1;
+}
+
+/* Main Layout */
+.app {
+    display: flex;
+    min-height: 100vh;
+    opacity: 0;
+    transition: opacity 0.6s;
+}
+
+.app.visible {
+    opacity: 1;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 280px;
+    background: white;
+    border-right: 2px solid var(--pink-light);
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+    transition: transform 0.3s;
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.sidebar-title {
+    font-family: 'ZCOOL KuaiLe', cursive;
+    font-size: 1.5rem;
+    color: var(--brown);
+}
+
+.sidebar-year {
+    font-size: 0.9rem;
+    color: var(--text);
+    opacity: 0.6;
+    margin-top: 0.5rem;
+}
+
+.notes-list {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.note-item {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.note-item:hover {
+    background: var(--pink-light);
+}
+
+.note-item.active {
+    background: var(--pink-light);
+    border-color: var(--pink);
+}
+
+.note-item-title {
+    font-family: 'ZCOOL KuaiLe', cursive;
+    font-size: 1.1rem;
+    color: var(--brown);
+    margin-bottom: 0.3rem;
+}
+
+.add-note-btn {
+    font-family: 'ZCOOL KuaiLe', cursive;
+    padding: 1rem;
+    background: var(--mint);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.add-note-btn:hover {
+    transform: scale(1.05);
+    background: #7bc8b8;
+}
+
+/* Main Content */
+.main {
+    flex: 1;
+    margin-left: 280px;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.letter-container {
+    max-width: 700px;
+    width: 100%;
+}
+
+.letter-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.letter-title {
+    font-family: 'ZCOOL KuaiLe', cursive;
+    font-size: 2.5rem;
+    color: var(--brown);
+    margin-bottom: 0.5rem;
+}
+
+.letter-content {
+    background: white;
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: 0 10px 40px rgba(139, 111, 71, 0.1);
+    position: relative;
+    line-height: 2;
+    font-size: 1.1rem;
+}
+
+.letter-content::before {
+    content: '♡';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    color: var(--pink);
+}
+
+.letter-text {
+    white-space: pre-wrap;
+}
+
+.letter-footer {
+    text-align: right;
+    margin-top: 2rem;
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.5rem;
+    color: var(--brown);
+}
+
+/* Decorative Elements */
+.decoration {
+    position: fixed;
+    pointer-events: none;
+    opacity: 0.3;
+    z-index: -1;
+}
+
+.deco-1 {
+    top: 10%;
+    right: 5%;
+    font-size: 4rem;
+    color: var(--pink);
+    animation: float 6s ease-in-out infinite;
+}
+
+.deco-2 {
+    bottom: 15%;
+    left: 10%;
+    font-size: 3rem;
+    color: var(--mint);
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+.deco-3 {
+    top: 50%;
+    right: 15%;
+    font-size: 2.5rem;
+    color: var(--yellow);
+    animation: float 7s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(10deg); }
+}
+
+/* Mobile Menu Toggle */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 200;
+    background: var(--pink);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 25px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-title {
+    font-family: 'ZCOOL KuaiLe', cursive;
+    font-size: 1.8rem;
+    color: var(--brown);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--pink-light);
+    border-radius: 15px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: var(--pink);
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--pink-light);
+    border-radius: 15px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem;
+    line-height: 1.8;
+    outline: none;
+    transition: border-color 0.3s;
+    resize: vertical;
+    min-height: 200px;
+}
+
+.form-textarea:focus {
+    border-color: var(--pink);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 15px;
+    font-family: 'ZCOOL KuaiLe', cursive;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+.btn-primary {
+    background: var(--pink);
+    color: white;
+}
+
+.btn-secondary {
+    background: var(--pink-light);
+    color: var(--brown);
+}
+
+.btn-danger {
+    background: #ff6b6b;
+    color: white;
+    flex: 0 0 auto;
+    padding: 1rem 1.5rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text);
+    opacity: 0.6;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state-text {
+    font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 5rem 1.5rem 2rem;
+    }
+
+    .letter-title {
+        font-size: 1.8rem;
+    }
+
+    .letter-content {
+        padding: 2rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .password-title {
+        font-size: 2rem;
+    }
+
+    .password-input {
+        font-size: 1.2rem;
+        width: 200px;
+    }
+}
+
+/* Token Setup Overlay */
+.token-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, var(--pink-light) 0%, var(--cream) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5000;
+}
+
+.token-modal {
+    background: white;
+    border-radius: 25px;
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(139, 111, 71, 0.15);
+}
+
+.token-title {
+    font-family: 'ZCOOL KuaiLe', cursive;
+    font-size: 1.8rem;
+    color: var(--brown);
+    margin-bottom: 1rem;
+}
+
+.token-desc {
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.token-hint {
+    font-size: 0.8rem;
+    color: var(--mint);
+    display: block;
+    margin-top: 0.5rem;
+}
+
+.token-input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 2px dashed var(--pink);
+    border-radius: 15px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.3s;
+    margin-bottom: 0.8rem;
+}
+
+.token-input:focus {
+    border-color: var(--mint);
+    border-style: solid;
+}
+
+.token-error {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    min-height: 1.2em;
+    opacity: 0;
+    transition: opacity 0.3s;
+    margin-bottom: 0.8rem;
+}
+
+.token-error.show {
+    opacity: 1;
+}
+
+.token-textarea {
+    width: 100%;
+    height: 200px;
+    padding: 1rem;
+    border: 2px solid var(--pink-light);
+    border-radius: 15px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    resize: none;
+    outline: none;
+    margin-bottom: 1rem;
+    background: #f9f9f9;
+}
+
+.token-textarea:focus {
+    border-color: var(--pink);
+}
+
+.token-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--mint);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-family: 'ZCOOL KuaiLe', cursive;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.token-btn:hover {
+    transform: scale(1.03);
+    background: #7bc8b8;
+}
+
+.token-skip {
+    margin-top: 1.2rem;
+}
+
+.token-skip a {
+    font-size: 0.85rem;
+    color: var(--text);
+    opacity: 0.5;
+    text-decoration: none;
+}
+
+.token-skip a:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Sync Bar */
+.sync-bar {
+    position: fixed;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.7rem 1.5rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: white;
+    z-index: 3000;
+    transition: bottom 0.4s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+}
+
+.sync-bar.show {
+    bottom: 1.5rem;
+}
+
+.sync-loading {
+    background: var(--brown);
+}
+
+.sync-saving {
+    background: var(--yellow);
+    color: var(--brown);
+}
+
+.sync-success {
+    background: var(--mint);
+}
+
+.sync-error {
+    background: #ff6b6b;
+}
+
+.sync-offline {
+    background: #999;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--pink);
+    border-radius: 4px;
+}

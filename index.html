@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0923 · 给你的信</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Password Screen -->
+    <div class="password-screen" id="passwordScreen">
+        <div class="password-title">♡ 给你的信 ♡</div>
+        <div class="password-subtitle">输入密码打开</div>
+        <input type="password" class="password-input" id="passwordInput" maxlength="8" placeholder="________">
+        <div class="password-error" id="passwordError">密码不对哦~</div>
+        <div class="password-hint">提示：你的生日</div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app" id="app">
+        <!-- Mobile Menu Toggle -->
+        <button class="menu-toggle" id="menuToggle">☰</button>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">♡ 给你的信 ♡</div>
+                <div class="sidebar-year" id="currentYear">2024</div>
+            </div>
+            <div class="notes-list" id="notesList"></div>
+            <button class="add-note-btn" id="addNoteBtn">+ 写一封新信</button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="letter-container" id="letterContainer"></div>
+        </main>
+    </div>
+
+    <!-- Decorative Elements -->
+    <div class="decoration deco-1">♡</div>
+    <div class="decoration deco-2">✿</div>
+    <div class="decoration deco-3">★</div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">写一封新信</div>
+            <div class="form-group">
+                <label class="form-label">标题</label>
+                <input type="text" class="form-input" id="noteTitle" placeholder="给这封信取个名字">
+            </div>
+            <div class="form-group">
+                <label class="form-label">内容</label>
+                <textarea class="form-textarea" id="noteContent" placeholder="写下你想说的话..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">落款</label>
+                <input type="text" class="form-input" id="noteSignature" placeholder="永远爱你的嘉豪">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="cancelBtn">取消</button>
+                <button class="btn btn-danger" id="deleteBtn" style="display:none;">删除</button>
+                <button class="btn btn-primary" id="saveBtn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

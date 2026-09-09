@@ -1,0 +1,121 @@
+# ============================================
+#   0923 · 给你的信 — 自动同步
+#   当前端创建 [0923] 开头的 Issue 时自动触发
+#   解析 Issue body 中的信件数据，更新 letters.json
+# ============================================
+
+name: Sync Letters
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  sync:
+    # 只处理标题以 [0923] 开头的 Issue
+    if: startsWith(github.event.issue.title, '[0923]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    # 防止并发冲突，排队处理
+    concurrency:
+      group: letters-sync
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Process letter
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // 解析 Issue body
+            let data;
+            try {
+              data = JSON.parse(context.payload.issue.body);
+            } catch (e) {
+              core.setFailed('Issue body 不是有效的 JSON');
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                state: 'closed',
+                state_reason: 'not_planned'
+              });
+              return;
+            }
+
+            // 读取当前 letters.json
+            let letters = [];
+            try {
+              letters = JSON.parse(fs.readFileSync('data/letters.json', 'utf8'));
+            } catch (e) {
+              letters = [];
+            }
+
+            // 处理操作
+            let changed = false;
+            switch (data.action) {
+              case 'add':
+                if (data.letter) {
+                  // 检查是否已存在（防止重复）
+                  const exists = letters.some(l => l.id === data.letter.id);
+                  if (!exists) {
+                    letters.push(data.letter);
+                    changed = true;
+                    core.info(`添加信件: ${data.letter.title || '未命名'}`);
+                  }
+                }
+                break;
+
+              case 'edit':
+                if (data.letter) {
+                  const idx = letters.findIndex(l => l.id === data.letter.id);
+                  if (idx >= 0) {
+                    letters[idx] = data.letter;
+                    changed = true;
+                    core.info(`编辑信件: ${data.letter.title || '未命名'}`);
+                  }
+                }
+                break;
+
+              case 'delete':
+                if (data.letter && data.letter.id) {
+                  const before = letters.length;
+                  letters = letters.filter(l => l.id !== data.letter.id);
+                  changed = letters.length !== before;
+                  core.info(`删除信件 ID: ${data.letter.id}`);
+                }
+                break;
+
+              default:
+                core.warning(`未知操作: ${data.action}`);
+            }
+
+            if (changed) {
+              // 写回 letters.json
+              fs.writeFileSync('data/letters.json', JSON.stringify(letters, null, 2));
+
+              // 提交并推送
+              const { execSync } = require('child_process');
+              execSync('git config user.name "github-actions[bot]"');
+              execSync('git config user.email "41898282+github-actions[bot]@users.noreply.github.com"');
+              execSync('git add data/letters.json');
+              execSync(`git commit -m "✉️ ${data.action} letter"`);
+              execSync('git push');
+              core.info('✅ 已同步到仓库');
+            } else {
+              core.info('没有需要更改的内容');
+            }
+
+            // 关闭 Issue
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed',
+              state_reason: 'completed'
+            });
+            core.info('Issue 已关闭');
