@@ -273,17 +273,37 @@ async function loadNotes() {
 
     showSyncStatus('loading', '正在加载信件...');
 
-    // 1. 先尝试从 GitHub 读取
+    // 1. 先尝试从 GitHub 读取（加时间戳防缓存）
     try {
-        const result = await githubReadFile('data/letters.json');
-        notes = JSON.parse(result.content);
-        currentFileSha = result.sha;
+        const config = getConfig();
+        const url = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/data/letters.json?_t=${Date.now()}`;
+        const resp = await fetch(url, { 
+            headers: githubHeaders(),
+            cache: 'no-store'
+        });
+        
+        if (resp.status === 404) {
+            console.log('[DEBUG] GitHub 上 letters.json 不存在 (404)');
+            throw new Error('文件不存在');
+        }
+        if (!resp.ok) {
+            throw new Error(`GitHub 读取失败 (${resp.status})`);
+        }
+        
+        const data = await resp.json();
+        const rawContent = atob(data.content);
+        const content = decodeURIComponent(escape(rawContent));
+        console.log('[DEBUG] GitHub 返回的内容:', content.substring(0, 200));
+        
+        const parsed = content.trim() ? JSON.parse(content) : [];
+        notes = parsed;
+        currentFileSha = data.sha;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-        showSyncStatus('success', '从 GitHub 加载 ✓');
+        showSyncStatus('success', `从 GitHub 加载 ${notes.length} 封信 ✓`);
         setTimeout(hideSyncStatus, 2000);
         return;
     } catch (e) {
-        console.log('GitHub 读取失败，尝试本地文件', e.message);
+        console.log('[DEBUG] GitHub 读取失败:', e.message);
     }
 
     // 2. GitHub 失败，读本地
@@ -294,7 +314,12 @@ async function loadNotesLocal() {
     try {
         const resp = await fetch('data/letters.json');
         if (resp.ok) {
-            notes = await resp.json();
+            const text = await resp.text();
+            if (text.trim()) {
+                notes = JSON.parse(text);
+            } else {
+                notes = [];
+            }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
             showSyncStatus('offline', '本地模式');
             setTimeout(hideSyncStatus, 2000);
